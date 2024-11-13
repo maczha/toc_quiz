@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Formal Languages Theory Quiz</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .quiz-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .question {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+        }
+        
+        .options {
+            margin-top: 10px;
+        }
+        
+        .option {
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .option:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .option input[type="radio"] {
+            margin-right: 10px;
+        }
+        
+        .topic-tag {
+            display: inline-block;
+            padding: 4px 8px;
+            background-color: #e3f2fd;
+            color: #1976d2;
+            border-radius: 4px;
+            font-size: 0.8em;
+            margin-bottom: 10px;
+        }
+        
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            background-color: #1976d2;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        button:hover {
+            background-color: #1565c0;
+        }
+        
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        #progress {
+            text-align: center;
+            margin: 20px 0;
+            color: #666;
+        }
+        
+        .question-review {
+            margin: 15px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .question-review.correct {
+            border-left: 4px solid #4caf50;
+            background-color: #f1f8e9;
+        }
+        
+        .question-review.incorrect {
+            border-left: 4px solid #f44336;
+            background-color: #ffebee;
+        }
+        
+        .answer-indicator {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .correct .answer-indicator {
+            color: #2e7d32;
+        }
+        
+        .incorrect .answer-indicator {
+            color: #c62828;
+        }
+        
+        .results-filters {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .filter-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background-color: #e0e0e0;
+            cursor: pointer;
+        }
+        
+        .filter-btn.active {
+            background-color: #1976d2;
+            color: white;
+        }
+        
+        .results-summary {
+            margin-bottom: 20px;
+            padding: 20px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+        }
+        
+        .topic-performance {
+            margin: 10px 0;
+            padding: 15px;
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .progress-bar {
+            height: 20px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: #4caf50;
+            transition: width 0.3s ease;
+        }
+        
+        #results {
+            display: none;
+        }
+        
+        .answer-section {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: rgba(255,255,255,0.7);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>Formal Languages Theory Quiz</h1>
+        <div id="progress">Question 1 of 50</div>
+        <div id="quiz"></div>
+        <div class="navigation">
+            <button id="prevBtn" onclick="previousQuestion()" disabled>Previous</button>
+            <button id="nextBtn" onclick="nextQuestion()">Next</button>
+            <button id="submitBtn" style="display: none;" onclick="submitQuiz()">Submit Quiz</button>
+        </div>
+        
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const questions = [
+            // The 50 questions from our previous JSON here
+            {
+      "question": "Which of the following is a valid pumping lemma decomposition for the string 'aabb' in the language L = {a^n b^n | n ≥ 0}?",
+      "options": [
+        "x='a', y='a', z='bb'",
+        "x='aa', y='b', z='b'",
+        "x='', y='aabb', z=''",
+        "This string cannot be pumped as L is not regular"
+      ],
+      "correct": 3,
+      "topic": "Pumping Regular Languages"
+    },
+    {
+      "question": "For the regular language L = {w | w contains 'ab'}, what is a valid decomposition of the string 'aabb'?",
+      "options": [
+        "x='a', y='ab', z='b'",
+        "x='a', y='a', z='bb'",
+        "x='aa', y='b', z='b'",
+        "None of the above"
+      ],
+      "correct": 0,
+      "topic": "Pumping Regular Languages"
+    },
+    {
+      "question": "In the pumping lemma for regular languages, what is true about the string y in the decomposition xyz?",
+      "options": [
+        "It must be at least length p",
+        "It must be non-empty and at most length p",
+        "It can be empty",
+        "It must be exactly length p"
+      ],
+      "correct": 1,
+      "topic": "Pumping Regular Languages"
+    },
+    {
+      "question": "Which step is essential in using the pumping lemma to prove a language is non-regular?",
+      "options": [
+        "Show that pumping works for one specific string",
+        "Show that pumping fails for at least one string",
+        "Show that pumping works for all strings",
+        "Show that the language is context-free"
+      ],
+      "correct": 1,
+      "topic": "Non-regular Proofs"
+    },
+    {
+      "question": "When proving L = {a^n b^n c^n | n ≥ 0} is non-regular, why is choosing s = a^p b^p c^p effective?",
+      "options": [
+        "Because it's the shortest possible string",
+        "Because it contains equal numbers of each symbol",
+        "Because it's long enough to force pumping to break the pattern",
+        "Because it contains all possible symbols in the language"
+      ],
+      "correct": 2,
+      "topic": "Non-regular Proofs"
+    },
+    {
+      "question": "What is a valid first step in proving a language is non-regular?",
+      "options": [
+        "Assume the language is context-free",
+        "Assume the language is regular",
+        "Choose any string in the language",
+        "Create a PDA for the language"
+      ],
+      "correct": 1,
+      "topic": "Non-regular Proofs"
+    },
+    {
+      "question": "Given the English description 'all strings with equal numbers of a's and b's', which CFG is correct?",
+      "options": [
+        "S → aSb | bSa | ε",
+        "S → aS | bS | ε",
+        "S → aSbS | bSaS | ε",
+        "S → ab | ba | ε"
+      ],
+      "correct": 2,
+      "topic": "CFG Creation"
+    },
+    {
+      "question": "What would be a correct CFG for the language 'all strings that start and end with the same symbol'?",
+      "options": [
+        "S → aAa | bBb | a | b; A → aA | bA | ε; B → aB | bB | ε",
+        "S → aSa | bSb | a | b",
+        "S → aA | bB; A → aA | a; B → bB | b",
+        "S → aa | bb | aaa | bbb"
+      ],
+      "correct": 0,
+      "topic": "CFG Creation"
+    },
+    {
+      "question": "For a PDA recognizing {a^n b^n | n ≥ 0}, which transition is essential?",
+      "options": [
+        "(q0, a, Z) → (q0, XZ)",
+        "(q0, ε, Z) → (q0, ε)",
+        "(q0, b, X) → (q0, ε)",
+        "(q0, ε, X) → (q0, XX)"
+      ],
+      "correct": 0,
+      "topic": "PDA Construction"
+    },
+    {
+      "question": "In a PDA transition (q, a, Z) → (p, γ), what does γ represent?",
+      "options": [
+        "The input symbol being read",
+        "The stack symbol being popped",
+        "The string to push onto the stack",
+        "The current state"
+      ],
+      "correct": 2,
+      "topic": "PDA Construction"
+    },
+    {
+      "question": "Given a parse tree for 'aabb', which CFG production must have been used if S is at the root and Ab is a child node?",
+      "options": [
+        "S → Ab",
+        "S → aAb",
+        "A → aA",
+        "None of the above"
+      ],
+      "correct": 0,
+      "topic": "Parse Tree Analysis"
+    },
+    {
+      "question": "When extracting a CFG from a parse tree, what does a leaf node represent?",
+      "options": [
+        "A variable in the grammar",
+        "A terminal symbol",
+        "A production rule",
+        "The start symbol"
+      ],
+      "correct": 1,
+      "topic": "Parse Tree Analysis"
+    },
+    {
+      "question": "Given the CFG S → AB, A → aA | ε, B → bB | ε, what's a valid leftmost derivation for 'ab'?",
+      "options": [
+        "S → AB → aB → ab",
+        "S → AB → Ab → ab",
+        "S → AB → aAB → aB → ab",
+        "S → AB → aAB → abB → ab"
+      ],
+      "correct": 1,
+      "topic": "Parse Tree Construction"
+    },
+    {
+      "question": "In a parse tree, what determines the order of children from left to right?",
+      "options": [
+        "Alphabetical order of symbols",
+        "Order of symbols in the production rule",
+        "Random arrangement",
+        "Bottom-up parsing order"
+      ],
+      "correct": 1,
+      "topic": "Parse Tree Construction"
+    },
+    {
+      "question": "When converting a CFG to a PDA using Lemma 2.21, what does the stack alphabet contain?",
+      "options": [
+        "Only terminal symbols",
+        "Only variables",
+        "Both variables and terminals",
+        "Neither variables nor terminals"
+      ],
+      "correct": 2,
+      "topic": "PDA from CFG"
+    },
+    {
+      "question": "Using Lemma 2.21, how many states does the resulting PDA need?",
+      "options": [
+        "One state per variable",
+        "One state per production",
+        "Three states total",
+        "One state"
+      ],
+      "correct": 2,
+      "topic": "PDA from CFG"
+    },
+    {
+      "question": "For the language L = {w#w | w ∈ {a,b}*}, what pumping length would disprove regularity?",
+      "options": [
+        "Any number greater than 0",
+        "The length of w",
+        "Twice the length of w",
+        "It depends on the string chosen"
+      ],
+      "correct": 3,
+      "topic": "Non-regular Proofs"
+    },
+    {
+      "question": "Which of these strings can be pumped in the language L = {a^n b^m | n > m}?",
+      "options": [
+        "aab",
+        "aaab",
+        "aabb",
+        "All of the above"
+      ],
+      "correct": 3,
+      "topic": "Pumping Regular Languages"
+    },
+    {
+      "question": "What CFG generates the language 'all strings with more a's than b's'?",
+      "options": [
+        "S → aS | aSb | a",
+        "S → aSS | a",
+        "S → aB | aS; B → aB | bB | ε",
+        "S → aaB | a; B → bB | ε"
+      ],
+      "correct": 2,
+      "topic": "CFG Creation"
+    },
+    {
+      "question": "In a PDA transition function, why do we need ε-transitions?",
+      "options": [
+        "To save memory",
+        "To handle stack operations without reading input",
+        "To make the PDA deterministic",
+        "To reduce the number of states"
+      ],
+      "correct": 1,
+      "topic": "PDA Construction"
+    },
+    {
+      "question": "Given a parse tree with root S and leaves spelling 'abab', what's true about internal nodes?",
+      "options": [
+        "They must all be variables",
+        "They can be terminals",
+        "They must alternate between variables and terminals",
+        "They must be binary"
+      ],
+      "correct": 0,
+      "topic": "Parse Tree Analysis"
+    },
+    {
+      "question": "When proving L = {a^n b^n c^n | n ≥ 0} is non-regular, which decomposition always works?",
+      "options": [
+        "xyz where y contains only a's",
+        "xyz where y contains both a's and b's",
+        "xyz where y contains only b's",
+        "None of the above"
+      ],
+      "correct": 3,
+      "topic": "Non-regular Proofs"
+    },
+    {
+      "question": "For the CFG S → aSa | bSb | ε, what's a valid parse tree for 'abba'?",
+      "options": [
+        "S → aSa → abSba → abba",
+        "S → bSb → baSab → abba",
+        "S → aSa → abSba → abbba",
+        "None of the above"
+      ],
+      "correct": 0,
+      "topic": "Parse Tree Construction"
+    },
+    {
+      "question": "Using Lemma 2.21, what happens when the PDA reads a terminal symbol?",
+      "options": [
+        "It pushes it onto the stack",
+        "It compares it with the stack top and pops if they match",
+        "It enters an accepting state",
+        "It creates a new state"
+      ],
+      "correct": 1,
+      "topic": "PDA from CFG"
+    },
+    {
+      "question": "Which language cannot be pumped?",
+      "options": [
+        "{a^n | n is prime}",
+        "{a^n b^n | n ≥ 0}",
+        "{w | w has equal a's and b's}",
+        "All of the above"
+      ],
+      "correct": 0,
+      "topic": "Pumping Regular Languages"
+    },
+    {
+      "question": "What CFG generates 'all palindromes over {a,b}'?",
+      "options": [
+        "S → aSa | bSb | a | b | ε",
+        "S → SS | a | b",
+        "S → aSb | bSa | ε",
+        "S → aS | bS | ε"
+      ],
+      "correct": 0,
+      "topic": "CFG Creation"
+    },
+    {
+      "question": "In a PDA for {wwR}, what must the stack do while reading the first half of the input?",
+      "options": [
+        "Pop symbols",
+        "Push symbols",
+        "Both push and pop",
+        "Neither push nor pop"
+      ],
+      "correct": 1,
+      "topic": "PDA Construction"
+    },
+    {
+      "question": "From a parse tree for 'aabb', if node A has children 'a' and B, what production must be in the CFG?",
+      "options": [
+        "A → aB",
+        "A → Ba",
+        "B → A",
+        "A → a"
+      ],
+      "correct": 0,
+      "topic": "Parse Tree Analysis"
+    },
+    {
+      "question": "Which string would you choose to prove {a^n b^n c^m | n,m ≥ 0} is non-regular?",
+      "options": [
+        "a^p b^p",
+        "a^p b^p c^p",
+        "a^p c^p",
+        "a^p b^p c"
+      ],
+      "correct": 1,
+      "topic": "Non-regular Proofs"
+    },
+    {
+      "question": "For the language L = {w | w has twice as many a's as b's}, which CFG is correct?",
+      "options": [
+        "S → aS | bS | ε",
+        "S → aaS | bS | ε",
+        "S → aaSb | ε",
+        "S → aaSb | aaS | ε"
+      ],
+      "correct": 2,
+      "topic": "CFG Creation"
+    },
+    {
+      "question": "What's the minimum number of states needed in a PDA for {a^n b^n | n ≥ 0}?",
+      "options": [
+        "One",
+        "Two",
+        "Three",
+        "Four"
+      ],
+      "correct": 1,
+      "topic": "PDA Construction"
+    },
+    {
+      "question": "When extracting a CFG from a parse tree, what do internal nodes represent?",
+      "options": [
+        "Terminal symbols",
+        "Variables",
+        "Production rules",
+        "Accept states"
+      ],
+      "correct": 1,
+      "topic": "Parse Tree Analysis"
+    },
+    {
+      "question": "Using Lemma 2.21, what initial stack symbol should the PDA have?",
+      "options": [
+        "The first terminal in the CFG",
+        "The start variable of the CFG",
+        "Any stack symbol",
+        "Empty stack"
+      ],
+      "correct": 1,
+      "topic": "PDA from CFG"
+    },
+    {
+      "question": "Which string in L = {a^n b^m | n ≥ m} can be pumped in the y part?",
+      "options": [
+        "Only a's",
+        "Only b's",
+        "Both a's and b's",
+        "Either only a's or only b's"
+      ],
+      "correct": 3,
+      "topic": "Pumping Regular Languages"
+    },
+    {
+      "question": "What CFG generates 'all strings with unequal numbers of a's and b's'?",
+      "options": [
+        "S → aS | bS | a | b",
+        "S → aA | bB; A → aA | bA | a; B → aB | bB | b",
+        "S → aSb | bSa | a | b",
+        "S → aB | bA; A → aA | a | ε; B → bB | b | ε"
+      ],
+      "correct": 1,
+      "topic": "CFG Creation"
+    }
+            // ... Rest of the 50 questions from our JSON ...
+        ];
+
+        let currentQuestion = 0;
+        let answers = new Array(questions.length).fill(null);
+
+        function displayQuestion(index) {
+            const question = questions[index];
+            const quizContainer = document.getElementById('quiz');
+            
+            quizContainer.innerHTML = `
+                <div class="question">
+                    <div class="topic-tag">${question.topic}</div>
+                    <p>${index + 1}. ${question.question}</p>
+                    <div class="options">
+                        ${question.options.map((option, i) => `
+                            <label class="option">
+                                <input type="radio" name="q${index}" value="${i}" 
+                                    ${answers[index] === i ? 'checked' : ''}>
+                                ${option}
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('progress').textContent = `Question ${index + 1} of ${questions.length}`;
+            document.getElementById('prevBtn').disabled = index === 0;
+            
+            if (index === questions.length - 1) {
+                document.getElementById('nextBtn').style.display = 'none';
+                document.getElementById('submitBtn').style.display = 'block';
+            } else {
+                document.getElementById('nextBtn').style.display = 'block';
+                document.getElementById('submitBtn').style.display = 'none';
+            }
+
+            const radioButtons = document.querySelectorAll(`input[name="q${index}"]`);
+            radioButtons.forEach(radio => {
+                radio.addEventListener('change', () => {
+                    answers[index] = parseInt(radio.value);
+                });
+            });
+        }
+
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                displayQuestion(currentQuestion);
+            }
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                displayQuestion(currentQuestion);
+            }
+        }
+
+        function submitQuiz() {
+            const unanswered = answers.includes(null);
+            if (unanswered) {
+                if (!confirm('You have unanswered questions. Do you want to submit anyway?')) {
+                    return;
+                }
+            }
+
+            const correctAnswers = answers.reduce((total, answer, index) => {
+                return total + (answer === questions[index].correct ? 1 : 0);
+            }, 0);
+            
+            const percentage = ((correctAnswers / questions.length) * 100).toFixed(2);
+
+            const topicStats = {};
+            questions.forEach((question, index) => {
+                if (!topicStats[question.topic]) {
+                    topicStats[question.topic] = {
+                        total: 0,
+                        correct: 0
+                    };
+                }
+                topicStats[question.topic].total++;
+                if (answers[index] === question.correct) {
+                    topicStats[question.topic].correct++;
+                }
+            });
+
+            document.getElementById('quiz').style.display = 'none';
+            document.getElementById('progress').style.display = 'none';
+            document.querySelector('.navigation').style.display = 'none';
+            
+            const results = document.getElementById('results');
+            results.style.display = 'block';
+            
+            results.innerHTML = `
+                <h2>Quiz Results</h2>
+                <div class="results-summary">
+                    <h3>Overall Score: ${correctAnswers} out of ${questions.length} (${percentage}%)</h3>
+                </div>
+                
+                <div class="results-filters">
+                    <button class="filter-btn active" onclick="filterResults('all')">All Questions</button>
+                    <button class="filter-btn" onclick="filterResults('correct')">Correct Answers</button>
+                    <button class="filter-btn" onclick="filterResults('incorrect')">Incorrect Answers</button>
+                </div>
+
+                <div class="topic-stats">
+                    <h3>Performance by Topic</h3>
+                    ${Object.entries(topicStats).map(([topic, stats]) => `
+                        <div class="topic-performance">
+                            <h4>${topic}</h4>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${(stats.correct/stats.total*100)}%"></div>
+                            </div>
+                            <p>${stats.correct} out of ${stats.total} (${((stats.correct/stats.total)*100).toFixed(2)}%)</p>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div class="results-container">
+                    <h3>Detailed Question Review</h3>
+                    ${questions.map((question, index) => `
+                        <div class="question-review ${answers[index] === question.correct ? 'correct' : 'incorrect'}" 
+                             data-status="${answers[index] === question.correct ? 'correct' : 'incorrect'}">
+                            <div class="answer-indicator">
+                                ${answers[index] === question.correct ? '✓ Correct' : '✗ Incorrect'}
+                            </div>
+                            <p><strong>Question ${index + 1}:</strong> ${question.question}</p>
+                            <div class="answer-section">
+                                <p>Your answer: ${question.options[answers[index]]}</p>
+                                ${answers[index] !== question.correct ? 
+                                    `<p class="correct-answer">Correct answer: ${question.options[question.correct]}</p>` 
+                                    : ''}
+                            </div>
+                            <div class="topic-tag">${question.topic}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function filterResults(type) {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            document.querySelectorAll('.question-review').forEach(question => {
+                if (type === 'all' || question.dataset.status === type) {
+                    question.style.display = 'block';
+                } else {
+                    question.style.display = 'none';
+                }
+            });
+        }
+
+        // Initialize the quiz
+        displayQuestion(0);
+    </script>
+</body>
+</html>
